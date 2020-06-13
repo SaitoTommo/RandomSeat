@@ -1,22 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 using TableControl;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Collections;
-using System.Diagnostics;
 
 namespace MainNameSpace
 {
     public partial class Form2 : Form
     {
         //int c = 0;
-        TableCon tableCon;
+        private TableCon tableCon;
         public delegate void ToCall();
         public delegate void ToCall1(string Data);
         public delegate void ToCall2(int Min, int Max);
@@ -53,7 +48,7 @@ namespace MainNameSpace
         {
             ClearTable();
         }
-       
+
         private void button5_Click(object sender, EventArgs e)
         {
             SelectPosition();
@@ -63,14 +58,14 @@ namespace MainNameSpace
         {
             GenerateTable();
         }
-        
+
         private void Form2_Load(object sender, EventArgs e)
         {
             for (int i = 0; i < 200; i++)
             {
                 Table1.Columns.Add(Table1.Columns.Count.ToString(), Table1.Columns.Count.ToString());
             }
-            for (int i = 0; i < 200; i++) 
+            for (int i = 0; i < 200; i++)
             {
                 Table1.Rows.Add();
             }
@@ -88,7 +83,7 @@ namespace MainNameSpace
             OpenTable();
         }
 
-        private void ShowProgress(string Status, float Progress) 
+        private void ShowProgress(string Status, float Progress)
         {
             StatusLabel.Text = Status;
             ProgressBar.Value = (int)Progress;
@@ -124,7 +119,7 @@ namespace MainNameSpace
 
         private void 关于ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(ProductName+" 版本:"+ProductVersion+ " 内核版本:0.0.0.1β" + "\n"+"Prod.GKT GKT作品 guotorre@gktsoft.com"+"\n"+"https://www.gktsoft.com");
+            MessageBox.Show(ProductName + " 版本:" + ProductVersion + " 内核版本:0.0.0.1β" + "\n" + "Prod.GKT GKT作品 guotorre@gktsoft.com" + "\n" + "https://www.gktsoft.com");
         }
 
         private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
@@ -134,15 +129,15 @@ namespace MainNameSpace
 
         private void Help_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("使用说明"+
-                "\n"+"1.添加足够的行和列（多了也没关系，存储时会自动删除）"+
-                "\n"+"2.按住Ctrl键框选你需要的坐标（被框选的坐标会高亮显示）"+
-                "\n"+"3.输入座号的最小值和最大值并点击生成按钮，并根据学号将单元格内容改为对应的名字或内容"+
-                "\n"+"4.点击保存按钮，在弹出的对话框中选择路径并保存"+"\n"+"5.如需打开以前的座位表点击打开按钮即可"+
-                
+            MessageBox.Show("使用说明" +
+                "\n" + "1.添加足够的行和列（多了也没关系，存储时会自动删除）" +
+                "\n" + "2.按住Ctrl键框选你需要的坐标（被框选的坐标会高亮显示）" +
+                "\n" + "3.输入座号的最小值和最大值并点击生成按钮，并根据学号将单元格内容改为对应的名字或内容" +
+                "\n" + "4.点击保存按钮，在弹出的对话框中选择路径并保存" + "\n" + "5.如需打开以前的座位表点击打开按钮即可" +
+
                 "\n2020年6月7日 新内容 增加映射表\n在txt文件第一行添加 Map Ver1.0 GKTSOFT " +
-                "\n随后每一行一个名字，行数对应学号，制作映射表后在表格的内右键->应用一个映射表即可使用"+
-                "\n"+"如有其他问题请电子邮箱联系 guotorre@gktsoft.com\n或到 https://www.gktsoft.com 留言"
+                "\n随后每一行一个名字，行数对应学号，制作映射表后在表格的内右键->应用一个映射表即可使用" +
+                "\n" + "如有其他问题请电子邮箱联系 guotorre@gktsoft.com\n或到 https://www.gktsoft.com 留言"
                 );
         }
 
@@ -187,7 +182,7 @@ namespace MainNameSpace
         /// <summary>
         /// 清空ListBox 供调用
         /// </summary>
-        public void ClearBox() 
+        public void ClearBox()
         {
             LBox1.Items.Clear();
         }
@@ -197,14 +192,14 @@ namespace MainNameSpace
         /// 供调用
         /// </summary>
         /// <param name="Data"></param>
-        public void AddToListBox(string Data) 
+        public void AddToListBox(string Data)
         {
             //LBox1.Items.Clear();
             LBox1.Items.Add(Data);
             label3.Text = $"共{LBox1.Items.Count}个";
         }
 
-        public void SetNumber(int min, int max) 
+        public void SetNumber(int min, int max)
         {
             TBox1.Text = $"{min}";
             TBox2.Text = $"{max}";
@@ -243,19 +238,19 @@ namespace MainNameSpace
 
         private void GenerateTable()
         {
-            int Max, Min,Num1=0,Num2=0;
-            string a="", b="";
-            if (textBox1.Text != null && 
-            (textBox1.Text.StartsWith("874") || textBox1.Text.StartsWith("884"))) 
+            int Max, Min, Num1 = 0, Num2 = 0;
+            string a = "", b = "";
+            if (textBox1.Text != null &&
+            (textBox1.Text.StartsWith("874") || textBox1.Text.StartsWith("884")))
             {
                 //MessageBox.Show("Test");
                 a = textBox1.Text.Substring(3, 2);
                 b = textBox1.Text.Substring(5, 2);
             }
             if (!int.TryParse(TBox1.Text, out Min) ||
-            !int.TryParse(TBox2.Text, out Max) || 
-            ((!int.TryParse(a, out Num1) || 
-            !int.TryParse(b, out Num2)))&&a!=""&&b!="")
+            !int.TryParse(TBox2.Text, out Max) ||
+            ((!int.TryParse(a, out Num1) ||
+            !int.TryParse(b, out Num2))) && a != "" && b != "")
             {
                 MessageBox.Show("请输入正确的值");
                 return;
@@ -265,7 +260,7 @@ namespace MainNameSpace
             {
                 tableCon.GenerateValue(Min, Max, Num1, Num2);
             }
-            else 
+            else
             {
                 tableCon.GenerateValue(Min, Max);
             }
@@ -279,12 +274,12 @@ namespace MainNameSpace
 
         private void 压力测试勿随意使用ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TimeSpan a,b,c,d,f,g,h;
+            TimeSpan a, b, c, d, f, g, h;
             ClearTable();
             MessageBox.Show("现在开始压力测试，期间可能出现卡死现象，请耐心等待。" +
                 "\n若有提示窗口出现请尽可能快的点击以尽可能获得准确结果。");
             a = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            for (int i = 0; i < 255; i++) 
+            for (int i = 0; i < 255; i++)
             {
                 Table1.Columns.Add(Table1.Columns.Count.ToString(), Table1.Columns.Count.ToString());
                 Table1.Rows.Add();
@@ -294,7 +289,7 @@ namespace MainNameSpace
             c = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
             SelectPosition();
             d = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            tableCon.GenerateValue(1,Table1.Rows.Count* Table1.Columns.Count);
+            tableCon.GenerateValue(1, Table1.Rows.Count * Table1.Columns.Count);
             f = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
             SaveTable();
             g = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -304,20 +299,20 @@ namespace MainNameSpace
             b = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
             #endregion
             #region MBox
-            MessageBox.Show(string.Format( 
+            MessageBox.Show(string.Format(
                 "压力测试完成" +
                 "\n共耗时:{0}秒" +
                 "\n其中选择坐标占用{1}秒" +
                 "\n记录坐标占用{2}秒" +
                 "\n生成内容占用{3}秒(包括操作浏览框的时间)" +
                 "\n保存表格占用{4}秒(包括操作浏览框的时间)" +
-                "\n打开表格占用{5}秒" 
-                ,Convert.ToInt64(b.TotalSeconds - a.TotalSeconds)
-                ,Convert.ToInt64(c.TotalSeconds - a.TotalSeconds)
-                ,Convert.ToInt64(d.TotalSeconds - c.TotalSeconds)
-                ,Convert.ToInt64(f.TotalSeconds - d.TotalSeconds)
-                ,Convert.ToInt64(g.TotalSeconds - f.TotalSeconds)
-                ,Convert.ToInt64(b.TotalSeconds - h.TotalSeconds)));
+                "\n打开表格占用{5}秒"
+                , Convert.ToInt64(b.TotalSeconds - a.TotalSeconds)
+                , Convert.ToInt64(c.TotalSeconds - a.TotalSeconds)
+                , Convert.ToInt64(d.TotalSeconds - c.TotalSeconds)
+                , Convert.ToInt64(f.TotalSeconds - d.TotalSeconds)
+                , Convert.ToInt64(g.TotalSeconds - f.TotalSeconds)
+                , Convert.ToInt64(b.TotalSeconds - h.TotalSeconds)));
             #endregion
         }
 
@@ -338,7 +333,7 @@ namespace MainNameSpace
         }
         //void doDel(BW bW) 
         //{
-           // bW();
+        // bW();
         //}
 
         private void label1_Click(object sender, EventArgs e)
@@ -351,6 +346,26 @@ namespace MainNameSpace
 
         }
 
+        private void Apply_Map(Stream stream)
+        {
+            string content = "";
+            StreamReader SR;
+            ArrayList NameList = new ArrayList();//映射数据
+            if (stream != null)
+            {
+                SR = new StreamReader(stream);
+                if (SR.ReadLine() != "Map Ver1.0 GKTSOFT") return;
+                content = SR.ReadLine();
+                while (content != null && content != string.Empty)
+                {
+                    NameList.Add(content);
+                    Debug.WriteLine(content);
+                    content = SR.ReadLine();
+
+                }
+                tableCon.ApplyMap(NameList);
+            }
+        }
         /// <summary>
         /// 打开映射表
         /// 读取 
@@ -360,10 +375,16 @@ namespace MainNameSpace
         /// <param name="e"></param>
         private void ApplyMap_Click(object sender, EventArgs e)//应用映射表
         {
-            StreamReader SR;
+            OpenMap();
+        }
+        private void button8_Click(object sender, EventArgs e)
+        {
+            OpenMap();
+        }
+
+        private void OpenMap()
+        {
             Stream stream;
-            ArrayList NameList=new ArrayList();//映射数据
-            string content="";
             MapDialog.ShowDialog();
             try
             {
@@ -374,21 +395,7 @@ namespace MainNameSpace
                 MessageBox.Show(f.Message);
                 throw f;
             }
-            
-            if (stream != null) 
-            { 
-                SR = new StreamReader(stream);
-                if (SR.ReadLine() != "Map Ver1.0 GKTSOFT") return;
-                content = SR.ReadLine();
-                while (content != null && content != string.Empty) 
-                {
-                    NameList.Add(content);
-                    Debug.WriteLine(content);
-                    content = SR.ReadLine();
-
-                }
-                tableCon.ApplyMap(NameList);
-            }
+            Apply_Map(stream);
         }
     }
 }

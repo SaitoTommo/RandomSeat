@@ -1,47 +1,42 @@
+using MainNameSpace;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
-using MainNameSpace;
-using System.Diagnostics;
+using System.Windows.Forms;
 
-namespace TableControl 
+namespace TableControl
 {
-    struct Position 
-	{
+    internal struct Position
+    {
         public int Row;
         public int Column;
-        public static Position NewPosition(int Row,int Column) 
-		{
+        public static Position NewPosition(int Row, int Column)
+        {
             Position a;
             a.Row = Row;
             a.Column = Column;
             return a;
-		}
-        public static string ToString(Position position) 
-		{
+        }
+        public static string ToString(Position position)
+        {
             return (string.Format("{0};{1}", position.Row, position.Column));
-		}
-        public static Position Parse(string Str) 
+        }
+        public static Position Parse(string Str)
         {
             if (Str == null || Str == "") return NewPosition(-1, -1);
             string[] a;
             Position position;
-            a=Regex.Split(Str, ";");
+            a = Regex.Split(Str, ";");
             Debug.WriteLine(Str + " " + a[0] + " " + a[1] + "From Parse");
             //Debug.WriteLine(a[0] + " " + a[1]);
-            if (a.Length != 2) return NewPosition(-1,-1);
+            if (a.Length != 2) return NewPosition(-1, -1);
             position.Column = int.Parse(a[1]);
             position.Row = int.Parse(a[0]);
             return position;
         }
-        public static bool operator ==(Position a, Position b) 
+        public static bool operator ==(Position a, Position b)
         {
             if (a.Column == b.Column && a.Row == b.Row) return true;
             return false;
@@ -53,35 +48,36 @@ namespace TableControl
         }
 
     }
-    class TableCon 
-	{
-        DataGridView dataGridView;
-        ArrayList Positions = new ArrayList();
-        Rad rad; 
-        public TableCon(DataGridView DGV) 
+
+    internal class TableCon
+    {
+        private DataGridView dataGridView;
+        private ArrayList Positions = new ArrayList();
+        private Rad rad;
+        public TableCon(DataGridView DGV)
         {
             dataGridView = DGV;
         }
-        public void EditCell(string Value,Position position) 
+        public void EditCell(string Value, Position position)
         {
             if (position.Row >= dataGridView.Rows.Count
-                || position.Column >= dataGridView.Columns.Count) 
+                || position.Column >= dataGridView.Columns.Count)
             {
                 AddCell(Value, position);
                 return;
             }
             dataGridView[position.Column, position.Row].Value = Value;
         }
-        public void AddCell(string Value, Position position) 
+        public void AddCell(string Value, Position position)
         {
-            if (dataGridView.Columns.Count-1< position.Column) 
+            if (dataGridView.Columns.Count - 1 < position.Column)
             {
-                for (int i = dataGridView.Columns.Count; i < position.Column + 1; i++) 
+                for (int i = dataGridView.Columns.Count; i < position.Column + 1; i++)
                 {
                     dataGridView.Columns.Add(dataGridView.Columns.Count.ToString(), dataGridView.Columns.Count.ToString());
                 }
             }
-            if (dataGridView.Rows.Count-1 < position.Row)
+            if (dataGridView.Rows.Count - 1 < position.Row)
             {
                 for (int i = dataGridView.Rows.Count; i < position.Row + 1; i++)
                 {
@@ -90,23 +86,23 @@ namespace TableControl
             }
             dataGridView[position.Column, position.Row].Value = Value;
         }
-        public void AddPosition(Position position) 
-		{
+        public void AddPosition(Position position)
+        {
             if (Positions.Contains(position)) return;
             Positions.Add(position);
-		}
+        }
         public void RenewPositions()
         {
             Positions = new ArrayList();
         }
-        public void GenerateValue(int Min,int Max) 
+        public void GenerateValue(int Min, int Max)
         {
-            rad = new Rad(Min, Max+1);
-            foreach (Position a in Positions) 
+            rad = new Rad(Min, Max + 1);
+            foreach (Position a in Positions)
             {
-                Debug.WriteLine(Position.ToString(a));
+                Debug.WriteLine(Position.ToString(a)+"From Generate");
                 dataGridView.CurrentCell = dataGridView[a.Column, a.Row];
-                dataGridView.CurrentCell.Value =rad.RadInt(); 
+                dataGridView.CurrentCell.Value = rad.RadInt();
             }
         }
         /// <summary>
@@ -116,7 +112,7 @@ namespace TableControl
         /// <param name="Max"></param>
         /// <param name="Num1">The Girl</param>
         /// <param name="Num2">The infatuated Boy</param>
-        public void GenerateValue(int Min, int Max,int Num1,int Num2)
+        public void GenerateValue(int Min, int Max, int Num1, int Num2)
         {
             ArrayList b = new ArrayList(2);
             Position j, k;
@@ -126,19 +122,19 @@ namespace TableControl
             {
                 dataGridView.CurrentCell = dataGridView[a.Column, a.Row];
                 dataGridView.CurrentCell.Value = rad.RadInt();
-                if ((int)dataGridView.CurrentCell.Value == Num1|| (int)dataGridView.CurrentCell.Value == Num2) b.Add(a);
+                if ((int)dataGridView.CurrentCell.Value == Num1 || (int)dataGridView.CurrentCell.Value == Num2) b.Add(a);
             }
-            if (b.Count>1&&b.Count<3&&Num1<=Max&&Num1>=Min && Num2 <= Max && Num2 >= Min&&Num1!=Num2)
+            if (b.Count > 1 && b.Count < 3 && Num1 <= Max && Num1 >= Min && Num2 <= Max && Num2 >= Min && Num1 != Num2)
             {
-                j = (Position)b[0];k = (Position)b[1];
-                if (j.Column - 1>=0&&dataGridView[j.Column - 1, j.Row].Value != null)
+                j = (Position)b[0]; k = (Position)b[1];
+                if (j.Column - 1 >= 0 && dataGridView[j.Column - 1, j.Row].Value != null)
                 {
                     d = dataGridView[j.Column - 1, j.Row].Value;
                     dataGridView[j.Column - 1, j.Row].Value = dataGridView[k.Column, k.Row].Value;
                     dataGridView[k.Column, k.Row].Value = d;
                     return;
                 }
-                else if (j.Column + 1>=1&& j.Column + 1 <dataGridView.Columns.Count&& dataGridView[j.Column + 1, j.Row].Value != null)
+                else if (j.Column + 1 >= 1 && j.Column + 1 < dataGridView.Columns.Count && dataGridView[j.Column + 1, j.Row].Value != null)
                 {
                     d = dataGridView[j.Column + 1, j.Row].Value;
                     dataGridView[j.Column + 1, j.Row].Value = dataGridView[k.Column, k.Row].Value;
@@ -161,16 +157,16 @@ namespace TableControl
                 }
             }
         }
-        public void SaveTable(Stream stream) 
+        public void SaveTable(Stream stream)
         {
-            string Data="",Data1="";
+            string Data = "", Data1 = "";
             using (StreamWriter SW = new StreamWriter(stream))
             {
                 foreach (DataGridViewColumn a in dataGridView.Columns)
                 {
                     foreach (DataGridViewRow b in dataGridView.Rows)
                     {
-                        if (dataGridView[a.Index, b.Index].Value != null) 
+                        if (dataGridView[a.Index, b.Index].Value != null)
                         {
                             Data += string.Format(
                                 "{0}@{1};{2}:",
@@ -178,23 +174,23 @@ namespace TableControl
                                 dataGridView[a.Index, b.Index].RowIndex,
                                 dataGridView[a.Index, b.Index].ColumnIndex
                                 );
-                            Data1 += Position.ToString(Position.NewPosition(b.Index, a.Index))+"&";
+                            Data1 += Position.ToString(Position.NewPosition(b.Index, a.Index)) + "&";
                             Debug.WriteLine(Position.ToString(Position.NewPosition(b.Index, a.Index)) + "&" + "From Save");
                         }
                     }
                 }
-                SW.WriteLine(Data+"\n"+Data1);
+                SW.WriteLine(Data + "\n" + Data1);
                 SW.Close();
             }
         }
         public void ReadTable(Stream stream, Form2.ToCall2 AfterAllDone = null, Form2.ToCall1 AfterDone = null, Form2.ToCall BeforeDone = null)
         {
-            string Data1,Data2;//Data 全部数据 Data1 座位表数据 Data2 选中的位置
+            string Data1, Data2;//Data 全部数据 Data1 座位表数据 Data2 选中的位置
             string[] a, b;//用于读取座位表数据的临时变量
             string[] D;//用于读取选中位置的数据
             ClearTable();
             BeforeDone?.Invoke();
-            using (StreamReader SR = new StreamReader(stream)) 
+            using (StreamReader SR = new StreamReader(stream))
             {
                 try
                 {
@@ -207,17 +203,17 @@ namespace TableControl
                     throw f;
                 }
                 //Regex.Split(Data,"\n")
-                a = Regex.Split(Data1,@":");
+                a = Regex.Split(Data1, @":");
                 D = Regex.Split(Data2, @"&");
-                foreach (string c in a) 
+                foreach (string c in a)
                 {
                     if (c == "" || c == null) continue;
                     b = Regex.Split(c, "@");
                     AddCell(b[0], Position.Parse(b[1]));
                 }
-                foreach (string d in D) 
+                foreach (string d in D)
                 {
-                    if (Position.Parse(d) == Position.NewPosition(-1,-1)) continue;
+                    if (Position.Parse(d) == Position.NewPosition(-1, -1)) continue;
                     Debug.WriteLine(d + "From Read Line");
                     AddPosition(Position.Parse(d));
                     AfterDone?.Invoke(d);
@@ -230,48 +226,53 @@ namespace TableControl
         /// 数字对应行
         /// </summary>
         /// <param name="NameList">映射表</param>
-        public void ApplyMap(ArrayList NameList) 
+        public void ApplyMap(ArrayList NameList)
         {
-            foreach (Position position in Positions) 
+            foreach (Position position in Positions)
             {
-                Debug.WriteLine(dataGridView[position.Column, position.Row].Value+"From Map");
-                if ((dataGridView[position.Column, position.Row].Value as string) != string.Empty) 
+                Debug.WriteLine(dataGridView[position.Column, position.Row].Value + "From Map");
+                if ((dataGridView[position.Column, position.Row].Value as string) != string.Empty)
                 {
                     int index = Convert.ToInt32(dataGridView[position.Column, position.Row].Value);
                     //int index = int.Parse((dataGridView[position.Column, position.Row].Value as string));
                     if ((index - 1) >= NameList.Count) continue;
-                    EditCell((string)NameList[index-1], position);
+                    EditCell((string)NameList[index - 1], position);
                 }
             }
         }
-        public void ClearTable() 
+        public void ClearTable()
         {
             dataGridView.Rows.Clear();
             dataGridView.Columns.Clear();
         }
     }
-    class Rad 
-	{
-        ArrayList NumList = new ArrayList(10);
-        static Random R = new Random();
-        int iMin, iMax;
-        public Rad(int Min,int Max) 
+
+    internal class Rad
+    {
+        private ArrayList NumList = new ArrayList(10);
+        private static Random R = new Random();
+        private int iMin, iMax;//iMax为生成的实际所需最大值，放入next()中要+1
+        public Rad(int Min, int Max)
         {
-            NumList = new ArrayList(Max);
+            NumList = new ArrayList(Max - 1);
             iMin = Min;
-            iMax = Max;
+            iMax = Max - 1;
+            NumList.Clear();
         }
-        public  int RadInt() 
-		{
-            int a = R.Next(iMin, iMax),b=0;
-            while (NumList.Contains(a)&&b<100) 
+        public int RadInt()
+        {
+            int a = R.Next(iMin, iMax + 1);
+            int IterationTime = 0;
+            while (NumList.Contains(a) && IterationTime <= NumList.Count * 1.5f) 
             {
                 a = R.Next(iMin, iMax);
-                b++;
+                Debug.WriteLine($"{a} From RadInt {NumList.Contains(a)}");
+                IterationTime++;
             }
-            if (NumList.Count >= 100) NumList.RemoveAt(0);
+            //if (NumList.Count >= 100) NumList.RemoveAt(0);
+            if (NumList.Count >= iMax) NumList.Clear();
             NumList.Add(a);
             return a;
-		}
-	}
+        }
+    }
 }
